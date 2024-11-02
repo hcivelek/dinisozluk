@@ -23,4 +23,27 @@
 
         </table>    
     </form>
+    <button onclick="scrollToTop()" id="backToTopBtn" style="position: fixed; bottom: 20px; right: 20px; display: none;">
+        <img src="/up.png" style="width: 45px;">
+    </button>
+
+    <script>
+  // Sayfayı yumuşak bir şekilde en üste kaydıran fonksiyon
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  // Butonu sayfa kaydırıldığında göster/gizle
+  window.onscroll = function() {
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+      backToTopBtn.style.display = "block";
+    } else {
+      backToTopBtn.style.display = "none";
+    }
+  };
+</script>    
 </div>
