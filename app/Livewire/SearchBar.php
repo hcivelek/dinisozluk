@@ -12,7 +12,11 @@ class SearchBar extends Component
     private $selected;
 
     public function search(){
-        $this->result = Word::where("search", "like", "%{$this->keyword}%")->take(10)->get();
+        $this->result = Word::where("search", "like", "%{$this->keyword}%")->get();
+    }
+
+    public function mount(){
+        $this->search();
     }
 
     public function select(string $word, string $keyword){

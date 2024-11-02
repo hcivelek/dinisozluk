@@ -10,7 +10,7 @@
 
             @foreach($result as $row)
             <tr>
-                <td class="p-1 font-bold cursor-pointer border border-green-600 text-left" wire:click="select('{{$row->word}}', '{{$keyword}}')">
+                <td class="p-1 font-bold cursor-pointer border border-green-600 text-left" wire:click="select('{{addslashes($row->word)}}', '{{$keyword}}')">
                     {{$row->word}}
                 </td>
             </tr>
