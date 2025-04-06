@@ -21,7 +21,7 @@ class Calendar extends Component
     }
 
     public function search(){
-        $query = Day::select("kameri_gun","kameri_yil","miladi_yil","mubarek_gun","gun");
+        $query = Day::select("kameri_gun","kameri_yil","miladi_yil","mubarek_gun","gun","miladi");
 
         if(isset($this->kameri_yil))
         {

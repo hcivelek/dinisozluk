@@ -56,7 +56,7 @@
                     {{$row->gun}}
                 </td>             
                 <td class="p-1 border border-td text-left">
-                    {{$row->miladi}}
+                    {{\Carbon\Carbon::parse($row->miladi)->format("d-m-Y")}}
                 </td>                
             </tr> 
             @endforeach
