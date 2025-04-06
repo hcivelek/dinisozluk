@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.border-td{
+    border:1px solid yellow;
+}
+
+@media (prefers-color-scheme: dark) { 
+    body{
+        background-color: #000;
+    }
+
+    .border-td{
+        background-color: transparent;
+        border:1px solid #d2d2d2
+    }
+}
