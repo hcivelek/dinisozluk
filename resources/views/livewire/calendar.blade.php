@@ -28,7 +28,7 @@
         @if(count($result))
 
 
-        <table class="mx-auto text-center hover:border-collapse mt-5 min-w-full">
+        <table class="mx-auto bg-gray-100 text-center hover:border-collapse mt-5 min-w-full">
             <tr class="text-xl">
                 <td>Hicrî Kamerî Tarih</td>
                 <td> Hicri Sene</td>
