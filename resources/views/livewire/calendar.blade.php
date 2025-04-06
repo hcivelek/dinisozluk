@@ -35,6 +35,7 @@
                 <td> Miladi Sene</td>
                 <td>Mubârek Günler</td>
                 <td>GÜN</td>
+                <td>Miladi</td>
             </tr>
 
             @foreach($result as $row)
@@ -53,7 +54,10 @@
                 </td>
                 <td class="p-1 border border-green-600 text-left">
                     {{$row->gun}}
-                </td>                                                 
+                </td>             
+                <td class="p-1 border border-green-600 text-left">
+                    {{$row->miladi}}
+                </td>                
             </tr> 
             @endforeach
 
