@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Dini Terimler Sözlüğü</title>
+        <title>Dini Sözlük - İslami Terimler Ansiklopedisi</title>
+        <meta name="description" content="Türkçe İslami ve dini terimlerin modern, kullanıcı dostu sözlüğü.">
+        <meta name="keywords" content="dini sözlük, islami terimler, kuran terimleri, namaz, farz, dua">
+        <meta property="og:title" content="Dini Sözlük - İslami Terimler Ansiklopedisi">
+        <meta property="og:description" content="Modern ve kullanıcı dostu Türkçe İslami sözlük.">
+        <meta property="og:type" content="website">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
         <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
         <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
         <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
@@ -33,7 +34,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased p-5">        
+    <body class="antialiased">
         <livewire:search-bar></livewire:search-bar>
     </body>
 </html>
