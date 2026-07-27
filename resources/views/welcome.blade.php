@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="tr" class="scroll-smooth">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +10,10 @@
         <meta property="og:title" content="Dini Sözlük - İslami Terimler Ansiklopedisi">
         <meta property="og:description" content="Modern ve kullanıcı dostu Türkçe İslami sözlük.">
         <meta property="og:type" content="website">
+        <meta property="og:locale" content="tr_TR">
+        <meta property="og:image" content="{{ url('/android-icon-192x192.png') }}">
+        <meta property="og:image:width" content="192">
+        <meta property="og:image:height" content="192">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

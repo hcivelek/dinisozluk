@@ -3,7 +3,8 @@
         $letters = ['A','B','C','Ç','D','E','F','G','Ğ','H','I','İ','J','K','L','M','N','O','Ö','P','R','S','Ş','T','U','Ü','V','Y','Z'];
         $groupedResults = collect($result)->groupBy(fn ($row) => mb_strtoupper(mb_substr($row->word, 0, 1, 'UTF-8'), 'UTF-8'));
         $resultCount = collect($result)->count();
-        $featuredWord = collect($result)->first();
+        $isSearching = trim((string) ($keyword ?? '')) !== '';
+        $featuredWord = $featuredWord ?? null;
     @endphp
 
     <header class="site-header sticky top-0 z-50">
@@ -14,7 +15,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25A8.966 8.966 0 0 1 18 3.75c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.966 8.966 0 0 0-6 2.292m0-14.25v14.25"/>
                     </svg>
                 </span>
-                <span class="font-serif text-lg font-semibold tracking-tight text-olive-600">Dini Sözlük</span>
+                <span class="brand-logo-text font-serif text-lg font-semibold tracking-tight"><span>Dini</span> Sözlük</span>
             </a>
 
             <div class="flex items-center gap-2 text-sm text-slate-500">
@@ -35,6 +36,7 @@
     </header>
 
     <main>
+        @unless($isSearching)
         <section class="hero-section relative overflow-hidden px-4 pb-8 pt-10 text-center sm:px-6 sm:pb-10 sm:pt-16">
             <div class="hero-ornament absolute right-8 top-4 hidden select-none lg:block" aria-hidden="true">☽</div>
             <div class="hero-ornament absolute bottom-3 left-10 hidden select-none text-6xl lg:block" aria-hidden="true">✦</div>
@@ -58,7 +60,7 @@
                         <input
                             id="search-input"
                             type="search"
-                            wire:model="keyword"
+                            wire:model.live.debounce.250ms="keyword"
                             placeholder="Bir kelime arayın... (örn. Ahiret, Dua)"
                             autocomplete="off"
                             aria-label="Kelime arayın"
@@ -68,21 +70,34 @@
                             Ara
                         </button>
                     </div>
+                    @if(!empty($suggestions))
+                        <div class="autocomplete-panel mt-2 overflow-hidden rounded-xl text-left shadow-xl">
+                            @foreach($suggestions as $suggestion)
+                                <button
+                                    type="button"
+                                    class="autocomplete-item flex w-full items-center justify-between px-4 py-3 text-sm"
+                                    wire:click="select('{{ addslashes($suggestion) }}', '{{ addslashes($suggestion) }}')"
+                                >
+                                    <span>{{ $suggestion }}</span>
+                                    <span aria-hidden="true">Ara</span>
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
                 </form>
 
                 <div class="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-slate-400">
                     <span class="font-medium text-olive-500">{{ $resultCount }} sonuç</span>
                     <span aria-hidden="true">·</span>
-                    <span>Ücretsiz ve açık erişim</span>
-                    <span aria-hidden="true">·</span>
-                    <a href="/takvim" class="text-olive-500 transition hover:text-olive-700" wire:navigate>Takvim</a>
+                    <a href="https://www.huzurpinari.com" target="_blank" rel="noopener noreferrer" class="text-olive-500 transition hover:text-olive-700">huzurpinari.com</a>
                 </div>
             </div>
         </section>
+        @endunless
 
-        @if($featuredWord)
+        @if(!$isSearching && $featuredWord)
             <section class="mx-auto mb-8 max-w-3xl px-4 sm:px-6">
-                <article class="featured-card relative overflow-hidden rounded-[1.5rem] p-6 text-white shadow-2xl sm:p-8">
+                <article class="featured-card relative cursor-pointer overflow-hidden rounded-[1.5rem] p-6 text-white shadow-2xl sm:p-8" role="button" tabindex="0" wire:click="select('{{ addslashes($featuredWord->word) }}', '{{ addslashes($featuredWord->word) }}')">
                     <div class="pointer-events-none absolute inset-0" aria-hidden="true">
                         <div class="absolute right-8 top-4 font-serif text-5xl text-white/10">✦</div>
                         <div class="absolute bottom-6 left-6 font-serif text-3xl text-white/10">☽</div>
@@ -137,7 +152,7 @@
                             <h2 class="section-letter mb-4 inline-flex pb-1 text-3xl font-bold">{{ $letter }}</h2>
                             <div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 @foreach($rows as $row)
-                                    <article class="word-card rounded-2xl p-5">
+                                    <article id="word-{{ md5($row->word) }}" data-word-name="{{ $row->word }}" class="word-card rounded-2xl p-5">
                                         <button
                                             type="button"
                                             class="flex w-full items-start justify-between gap-4 text-left"
@@ -156,23 +171,42 @@
                                                 {!! nl2br($row->detail) !!}
                                             </div>
 
-                                            <div class="mt-4 flex justify-end border-t border-slate-100 pt-3">
-                                                <a
-                                                    href="{{ url('/').'?kelime='.urlencode($row->word) }}"
-                                                    class="word-link"
-                                                    title="{{ $row->word }} bağlantısını aç"
-                                                    aria-label="{{ $row->word }} bağlantısını aç"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                                                    </svg>
+                                            <div class="word-actions mt-4 flex justify-end gap-2 border-t border-slate-100 pt-3">
+                                                <button type="button" class="word-link favorite-button" data-favorite-word="{{ $row->word }}" title="Favorilere ekle" aria-label="{{ $row->word }} favorilere ekle">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 0 0 .95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 0 0-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 0 0-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 0 0-.363-1.118L1.577 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 0 0 .951-.69l1.519-4.674z"/></svg>
+                                                </button>
+                                                <button type="button" class="word-link" data-copy-text="{{ $row->word }} - {{ Str::limit(strip_tags($row->detail), 240) }}" title="Kopyala" aria-label="{{ $row->word }} kopyala">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                                </button>
+                                                <button type="button" class="word-link" data-whatsapp-text="{{ $row->word }} - {{ Str::limit(strip_tags($row->detail), 240) }} {{ url('/').'?kelime='.urlencode($row->word) }}" title="WhatsApp ile paylaş" aria-label="{{ $row->word }} WhatsApp ile paylaş">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                                </button>
+                                                <a href="{{ url('/').'?kelime='.urlencode($row->word) }}" class="word-link" title="{{ $row->word }} bağlantısını aç" aria-label="{{ $row->word }} bağlantısını aç">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                                                 </a>
                                             </div>
                                         @else
                                             <p class="mt-3 text-sm leading-6 text-slate-500">
                                                 {{ Str::limit(strip_tags($row->detail), 135) }}
                                             </p>
+                                            @if(Str::length(strip_tags($row->detail)) > 135)
+                                                <button
+                                                    type="button"
+                                                    class="read-more mt-3 text-sm font-semibold"
+                                                    wire:click="select('{{ addslashes($row->word) }}', '{{ addslashes($keyword ?? '') }}')"
+                                                >Devamını oku</button>
+                                            @endif
+                                            <div class="word-actions mt-4 flex justify-end gap-2 border-t border-slate-100 pt-3">
+                                                <button type="button" class="word-link favorite-button" data-favorite-word="{{ $row->word }}" title="Favorilere ekle" aria-label="{{ $row->word }} favorilere ekle">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 0 0 .95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 0 0-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 0 0-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 0 0-.363-1.118L1.577 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 0 0 .951-.69l1.519-4.674z"/></svg>
+                                                </button>
+                                                <button type="button" class="word-link" data-copy-text="{{ $row->word }} - {{ Str::limit(strip_tags($row->detail), 240) }}" title="Kopyala" aria-label="{{ $row->word }} kopyala">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                                </button>
+                                                <button type="button" class="word-link" data-whatsapp-text="{{ $row->word }} - {{ Str::limit(strip_tags($row->detail), 240) }} {{ url('/').'?kelime='.urlencode($row->word) }}" title="WhatsApp ile paylaş" aria-label="{{ $row->word }} WhatsApp ile paylaş">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                                </button>
+                                            </div>
                                         @endif
                                     </article>
                                 @endforeach
@@ -213,6 +247,52 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+            const favoriteKey = 'ds_favorites';
+            const favorites = () => JSON.parse(localStorage.getItem(favoriteKey) || '[]');
+            const saveFavorites = (items) => localStorage.setItem(favoriteKey, JSON.stringify(items));
+            const refreshFavoriteButtons = () => {
+                const items = favorites();
+                document.querySelectorAll('[data-favorite-word]').forEach((button) => {
+                    const active = items.includes(button.dataset.favoriteWord);
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+            };
+
+            document.addEventListener('click', async (event) => {
+                const favoriteButton = event.target.closest('[data-favorite-word]');
+                if (favoriteButton) {
+                    const word = favoriteButton.dataset.favoriteWord;
+                    const items = favorites();
+                    const next = items.includes(word) ? items.filter((item) => item !== word) : [...items, word];
+                    saveFavorites(next);
+                    refreshFavoriteButtons();
+                    return;
+                }
+
+                const copyButton = event.target.closest('[data-copy-text]');
+                if (copyButton) {
+                    await navigator.clipboard?.writeText(copyButton.dataset.copyText);
+                    return;
+                }
+
+                const whatsappButton = event.target.closest('[data-whatsapp-text]');
+                if (whatsappButton) {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappButton.dataset.whatsappText)}`, '_blank', 'noopener,noreferrer');
+                }
+            });
+
+            window.addEventListener('word-selected', (event) => {
+                setTimeout(() => {
+                    const target = [...document.querySelectorAll('[data-word-name]')].find((item) => item.dataset.wordName === event.detail.word);
+                    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 120);
+            });
+
+            document.addEventListener('livewire:navigated', refreshFavoriteButtons);
+            document.addEventListener('livewire:initialized', refreshFavoriteButtons);
+            refreshFavoriteButtons();
+
             const html = document.documentElement;
             const toggle = document.getElementById('theme-toggle');
             const moon = document.getElementById('moon-icon');

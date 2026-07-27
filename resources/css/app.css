@@ -385,3 +385,95 @@ mark {
 html.dark mark {
     background: rgba(107, 127, 111, 0.28);
 }
+
+
+.brand-logo-text {
+    color: var(--olive-600);
+}
+
+.brand-logo-text span {
+    color: #fff;
+    background: var(--olive-600);
+    border-radius: 0.35rem;
+    padding: 0.05rem 0.28rem 0.12rem;
+}
+
+html.dark .brand-logo-text {
+    color: #e8e3d5;
+}
+
+.autocomplete-panel {
+    border: 1px solid #e4eadf;
+    background: #fff;
+}
+
+.autocomplete-item {
+    color: #334155;
+    transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.autocomplete-item + .autocomplete-item {
+    border-top: 1px solid #edf0eb;
+}
+
+.autocomplete-item span:last-child {
+    color: var(--olive-500);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item:focus-visible {
+    background: #f4f7f1;
+    color: var(--olive-700);
+    outline: none;
+}
+
+.read-more {
+    color: var(--olive-500);
+}
+
+.read-more:hover,
+.read-more:focus-visible {
+    color: var(--olive-700);
+    outline: none;
+    text-decoration: underline;
+}
+
+.word-actions .word-link {
+    background: #fff;
+}
+
+.favorite-button.active {
+    border-color: var(--gold-400);
+    background: rgba(212, 168, 67, 0.12);
+    color: var(--gold-400);
+}
+
+.favorite-button.active svg {
+    fill: currentColor;
+}
+
+html.dark .autocomplete-panel,
+html.dark .word-actions .word-link {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: #222820;
+}
+
+html.dark .autocomplete-item {
+    color: #e8e3d5;
+}
+
+html.dark .autocomplete-item + .autocomplete-item {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark .autocomplete-item:hover,
+html.dark .autocomplete-item:focus-visible {
+    background: rgba(107, 127, 111, 0.16);
+    color: #fff;
+}
+
+html.dark .hero-section .text-slate-800 {
+    color: #fff;
+}
