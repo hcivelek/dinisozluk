@@ -514,6 +514,7 @@ html.dark .brand-logo-text {
 }
 
 .autocomplete-item:hover,
+.autocomplete-item.active,
 .autocomplete-item:focus-visible {
     background: #f4f7f1;
     color: var(--olive-700);
@@ -560,6 +561,7 @@ html.dark .autocomplete-item + .autocomplete-item {
 }
 
 html.dark .autocomplete-item:hover,
+html.dark .autocomplete-item.active,
 html.dark .autocomplete-item:focus-visible {
     background: rgba(107, 127, 111, 0.16);
     color: #fff;

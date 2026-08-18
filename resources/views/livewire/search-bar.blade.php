@@ -75,7 +75,11 @@
                         <input
                             id="search-input"
                             type="search"
-                            wire:model.live.debounce.250ms="keyword"
+                            wire:model="keyword"
+                            data-suggestions-url="{{ route('search.index') }}"
+                            aria-autocomplete="list"
+                            aria-controls="autocomplete-panel"
+                            aria-expanded="false"
                             placeholder="Bir kelime arayın... (örn. Ahiret, Dua)"
                             autocomplete="off"
                             aria-label="Kelime arayın"
@@ -85,20 +89,7 @@
                             Ara
                         </button>
                     </div>
-                    @if(!empty($suggestions) && trim((string) ($keyword ?? '')) !== '')
-                        <div class="autocomplete-panel absolute left-1/2 z-50 mt-2 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 overflow-hidden rounded-xl text-left shadow-xl sm:w-full">
-                            @foreach($suggestions as $suggestion)
-                                <button
-                                    type="button"
-                                    class="autocomplete-item flex w-full items-center justify-between px-4 py-3 text-sm"
-                                    wire:click="select('{{ addslashes($suggestion) }}', '{{ addslashes($suggestion) }}')"
-                                >
-                                    <span>{{ $suggestion }}</span>
-                                    <span aria-hidden="true">Ara</span>
-                                </button>
-                            @endforeach
-                        </div>
-                    @endif
+                    <div id="autocomplete-panel" class="autocomplete-panel absolute left-1/2 z-50 mt-2 hidden w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 overflow-hidden rounded-xl text-left shadow-xl sm:w-full" role="listbox"></div>
                 </form>
 
                 @unless($isSearching)

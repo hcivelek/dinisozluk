@@ -13,7 +13,6 @@ class SearchBar extends Component
     public $activeLetter = 'A';
     #[Url(as: 'kelime', except: '')]
     public $selected = '';
-    public $suggestions = [];
     public $featuredWord;
     public bool $hasSearched = false;
     public string $submittedKeyword = '';
@@ -31,7 +30,6 @@ class SearchBar extends Component
         $this->selected = '';
         $this->hasSearched = true;
         $this->submittedKeyword = $keyword;
-        $this->suggestions = [];
         $this->dispatch('search-completed');
     }
 
@@ -40,7 +38,6 @@ class SearchBar extends Component
         $this->activeLetter = $letter;
         $this->keyword = '';
         $this->selected = '';
-        $this->suggestions = [];
         $this->hasSearched = false;
         $this->submittedKeyword = '';
     }
@@ -66,18 +63,6 @@ class SearchBar extends Component
         $this->loadLetter($this->activeLetter);
     }
 
-    public function updatedKeyword(): void
-    {
-        $keyword = trim((string) $this->keyword);
-
-        if ($keyword === '') {
-            $this->suggestions = [];
-            return;
-        }
-
-        $this->suggestions = $this->buildSuggestions($this->searchWords($keyword));
-    }
-
     public function select(string $word, string $keyword = '')
     {
         $this->selected = $word;
@@ -90,7 +75,6 @@ class SearchBar extends Component
             $this->submittedKeyword = $keyword;
         }
 
-        $this->suggestions = [];
         $this->dispatch('word-selected', word: $word);
     }
 
@@ -106,7 +90,6 @@ class SearchBar extends Component
             'result' => $result,
             'selected' => $this->selected ?? '',
             'activeLetter' => $this->activeLetter,
-            'suggestions' => $this->suggestions,
             'featuredWord' => $this->featuredWord,
             'hasSearched' => $this->hasSearched,
         ]);
@@ -180,15 +163,6 @@ class SearchBar extends Component
         }
 
         return $length <= 8 ? 2 : 3;
-    }
-
-    private function buildSuggestions(Collection $results): array
-    {
-        return $results
-            ->take(8)
-            ->map(fn (Word $word) => $word->word)
-            ->values()
-            ->all();
     }
 
     private function randomFeaturedWord(): ?Word
