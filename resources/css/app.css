@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.hidden {
+    display: none;
+}
+
 :root {
     --cream-50: #fdfbf7;
     --cream-100: #faf7f2;
@@ -81,6 +85,16 @@ html.dark .site-header {
     background: rgba(26, 31, 22, 0.92);
 }
 
+.search-results-header {
+    border-bottom: 1px solid #edf0eb;
+    background: var(--cream-100);
+}
+
+html.dark .search-results-header {
+    border-bottom-color: rgba(255, 255, 255, 0.07);
+    background: var(--charcoal-900);
+}
+
 .icon-button {
     display: inline-flex;
     width: 2.5rem;
@@ -103,6 +117,77 @@ html.dark .icon-button {
     color: #a8b1a4;
 }
 
+.favorite-count {
+    position: absolute;
+    right: -0.2rem;
+    top: -0.2rem;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    padding: 0 0.25rem;
+    border: 2px solid var(--cream-50);
+    border-radius: 9999px;
+    background: var(--gold-400);
+    color: #111510;
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 0.9rem;
+    text-align: center;
+}
+
+html.dark .favorite-count {
+    border-color: var(--charcoal-800);
+}
+
+.favorites-panel {
+    position: fixed;
+    right: 1rem;
+    top: 4.5rem;
+    z-index: 70;
+    width: min(22rem, calc(100vw - 2rem));
+    border: 1px solid #e4eadf;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(17, 21, 16, 0.18);
+}
+
+.favorite-list-item {
+    display: block;
+    border-radius: 0.375rem;
+    padding: 0.7rem 0.8rem;
+    color: #334155;
+    font-family: "Playfair Display", Georgia, serif;
+    font-weight: 600;
+    transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.favorite-list-item:hover,
+.favorite-list-item:focus-visible {
+    background: #f4f7f1;
+    color: var(--olive-700);
+    outline: none;
+}
+
+html.dark .favorites-panel {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: #222820;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .favorites-panel .text-slate-800,
+html.dark .favorite-list-item {
+    color: #e8e3d5;
+}
+
+html.dark .favorites-panel .border-slate-100 {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark .favorite-list-item:hover,
+html.dark .favorite-list-item:focus-visible {
+    background: rgba(107, 127, 111, 0.16);
+    color: #fff;
+}
+
 .hero-section {
     background:
         radial-gradient(circle at 80% 0%, rgba(212, 168, 67, 0.13), transparent 30rem),
@@ -122,6 +207,12 @@ html.dark .hero-section {
     line-height: 1;
     opacity: 0.12;
     pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+    .hero-ornament.hidden {
+        display: block;
+    }
 }
 
 html.dark .hero-ornament {

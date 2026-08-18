@@ -15,7 +15,8 @@ class SearchBar extends Component
     public $selected = '';
     public $suggestions = [];
     public $featuredWord;
-    private $result;
+    public bool $hasSearched = false;
+    public string $submittedKeyword = '';
 
     public function search()
     {
@@ -28,8 +29,10 @@ class SearchBar extends Component
 
         $this->activeLetter = '';
         $this->selected = '';
-        $this->result = $this->searchWords($keyword);
-        $this->suggestions = $this->buildSuggestions($this->result);
+        $this->hasSearched = true;
+        $this->submittedKeyword = $keyword;
+        $this->suggestions = [];
+        $this->dispatch('search-completed');
     }
 
     public function loadLetter(string $letter)
@@ -38,23 +41,22 @@ class SearchBar extends Component
         $this->keyword = '';
         $this->selected = '';
         $this->suggestions = [];
-        $this->result = Word::where("word", "like", "{$letter}%")
-            ->orderBy('word')
-            ->get();
+        $this->hasSearched = false;
+        $this->submittedKeyword = '';
     }
 
     public function mount()
     {
-        $this->featuredWord = $this->dailyFeaturedWord();
+        $this->featuredWord = $this->randomFeaturedWord();
 
         if ($this->selected !== '') {
             $word = Word::where('word', $this->selected)->first();
 
             if ($word) {
-                $this->activeLetter = mb_strtoupper(mb_substr($word->word, 0, 1, 'UTF-8'), 'UTF-8');
-                $this->result = Word::where("word", "like", "{$this->activeLetter}%")
-                    ->orderBy('word')
-                    ->get();
+                $this->keyword = $word->word;
+                $this->activeLetter = '';
+                $this->hasSearched = true;
+                $this->submittedKeyword = $word->word;
                 return;
             }
 
@@ -66,7 +68,14 @@ class SearchBar extends Component
 
     public function updatedKeyword(): void
     {
-        $this->search();
+        $keyword = trim((string) $this->keyword);
+
+        if ($keyword === '') {
+            $this->suggestions = [];
+            return;
+        }
+
+        $this->suggestions = $this->buildSuggestions($this->searchWords($keyword));
     }
 
     public function select(string $word, string $keyword = '')
@@ -77,11 +86,8 @@ class SearchBar extends Component
         if ($keyword !== '') {
             $this->keyword = $keyword;
             $this->activeLetter = '';
-            $this->result = $this->searchWords($keyword);
-        } else {
-            $this->result = Word::where("word", "like", "{$this->activeLetter}%")
-                ->orderBy('word')
-                ->get();
+            $this->hasSearched = true;
+            $this->submittedKeyword = $keyword;
         }
 
         $this->suggestions = [];
@@ -90,12 +96,19 @@ class SearchBar extends Component
 
     public function render()
     {
+        $result = $this->hasSearched
+            ? $this->searchWords($this->submittedKeyword)
+            : Word::where('word', 'like', "{$this->activeLetter}%")
+                ->orderBy('word')
+                ->get();
+
         return view('livewire.search-bar', [
-            'result' => $this->result ?? [],
+            'result' => $result,
             'selected' => $this->selected ?? '',
             'activeLetter' => $this->activeLetter,
             'suggestions' => $this->suggestions,
             'featuredWord' => $this->featuredWord,
+            'hasSearched' => $this->hasSearched,
         ]);
     }
 
@@ -178,7 +191,7 @@ class SearchBar extends Component
             ->all();
     }
 
-    private function dailyFeaturedWord(): ?Word
+    private function randomFeaturedWord(): ?Word
     {
         $count = Word::count();
 
@@ -186,12 +199,9 @@ class SearchBar extends Component
             return null;
         }
 
-        $offset = crc32(now()->toDateString()) % $count;
-
         return Word::query()
             ->select('id', 'word', 'search', 'detail')
-            ->orderBy('word')
-            ->skip($offset)
+            ->inRandomOrder()
             ->first();
     }
 
